@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Chat - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #343541;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #toggleSidebar {
+      display: none;
+    }
+
+    .sidebar-label {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background-color: #10a37f;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 3;
+      font-size: 0.9rem;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      height: 90vh;
+      display: flex;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .sidebar {
+      background-color: #202123;
+      width: 280px;
+      padding: 15px;
+      overflow-y: auto;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 2;
+    }
+
+    #toggleSidebar:checked ~ .container .sidebar {
+      transform: translateX(0);
+    }
+
+    .sidebar h2 {
+      font-size: 1rem;
+      margin: 0;
+      color: #ccc;
+    }
+
+    .chat-session {
+      background-color: #2d2d30;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .chat-session.active {
+      background-color: #10a37f;
+      color: #fff;
+    }
+
+    .chat-session:hover {
+      background-color: #3e3f44;
+    }
+
+    .chat-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #343541;
+      margin-left: auto;
+      width: 100%;
+    }
+
+    .chat-header {
+      background-color: #202123;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+    }
+
+    .chat-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 16px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      margin: 8px 0;
+      max-width: 70%;
+      font-size: 0.95rem;
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: #10a37f;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .ai {
+      align-self: flex-start;
+      background-color: #444654;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .timestamp {
+      font-size: 0.7rem;
+      color: #aaa;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .input-form {
+      padding: 12px 20px;
+      border-top: 1px solid #444;
+      background-color: #343541;
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      background-color: #40414f;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 0.9rem;
+      resize: vertical;
+      height: 80px;
+      color: white;
+    }
+
+    input[type="submit"].btn,
+    button.btn {
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-new {
+      background-color: #10a37f;
+      color: white;
+    }
+
+    .btn-new:hover {
+      background-color: #0d8b6e;
+    }
+
+    .btn-clear {
+      background-color: #c0392b;
+      color: white;
+    }
+
+    .btn-clear:hover {
+      background-color: #a93226;
+    }
+
+    .btn-logout {
+      background-color: #555;
+      color: white;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .flash-message {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #2ecc71;
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #fff;
+      z-index: 1050;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      animation: fadeOut 3.5s forwards;
+    }
+
+    .flash-message.error {
+      background-color: #e74c3c;
+    }
+
+    .flash-message.info {
+      background-color: #3498db;
+    }
+
+    .flash-message.warning {
+      background-color: #f39c12;
+    }
+
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      85% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <input type="checkbox" id="toggleSidebar">
+  <label for="toggleSidebar" class="sidebar-label">☰</label>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Chat History</h2>
+        <form method="POST" action="{{ url_for('clear_history') }}">
+          <input type="submit" value="Clear All" class="btn btn-clear" style="padding: 4px 8px; font-size: 0.7rem;">
+        </form>
+      </div>
+      <hr style="border-color: #444; margin: 10px 0;">
+
+      {% for session_item in sessions %}
+        <a href="{{ url_for('home', session_id=session_item.chat_session_id) }}">
+          <div class="chat-session {% if session_item.chat_session_id == current_session %}active{% endif %}">
+            {{ session_item.title or 'Untitled' }}<br>
+            <small>{{ session_item.started_at.strftime('%b %d, %Y %H:%M') }} IST</small>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-wrapper">
+      <div class="chat-header">
+        <span>Welcome, {{ current_user.username }}!</span>
+        <div class="chat-actions">
+          <form method="POST" action="{{ url_for('new_chat') }}">
+            <input type="submit" value="New Chat" class="btn btn-new">
+          </form>
+          <form method="POST" action="{{ url_for('logout') }}">
+            <input type="submit" value="Logout" class="btn btn-logout">
+          </form>
+        </div>
+      </div>
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="chat-box">
+        {% for q in all_queries %}
+          <div class="message user">
+            {{ q.user_query }}
+            <div class="timestamp">{{ q.timestamp.strftime('%b %d, %Y %H:%M') }} IST</div>
+          </div>
+          <div class="message ai">
+            {{ q.ai_response }}
+            <div class="timestamp">{{ q.timestamp.strftime('%b %d, %Y %H:%M') }} IST</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if not readonly %}
+        <form method="POST" action="{{ url_for('submit_query') }}" class="input-form">
+          <textarea name="query" placeholder="Send a message..." required></textarea>
+          <button type="submit" class="btn btn-new">Send</button>
+        </form>
+      {% else %}
+        <div class="input-form">
+          <textarea placeholder="You are viewing a previous session. Start a new chat to continue." disabled></textarea>
+          <button class="btn btn-new" disabled style="cursor: not-allowed; opacity: 0.6;">Send</button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

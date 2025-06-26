@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Official Website</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f7f7f7;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .login-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 40px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .form-footer a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .form-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .form-group label {
+      font-size: 16px;
+      color: #555;
+    }
+
+    .form-group input {
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .form-group input:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-block {
+      font-size: 18px;
+    }
+
+    /* Flash Messages Styling */
+    #flash-container {
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1050;
+      width: auto;
+      max-width: 90%;
+    }
+
+    .flash-message {
+      padding: 6px 14px;
+      font-size: 14px;
+      border-radius: 4px;
+      text-align: center;
+      display: inline-block;
+      animation: fadeOut 3s forwards;
+    }
+
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div id="flash-container">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} flash-message">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="container login-container">
+    <h1>Login</h1>
+
+    {% if form.errors %}
+      <div class="alert alert-danger mt-3">
+        Please fix the errors in the form.
+      </div>
+    {% endif %}
+
+    <form method="POST" class="mt-3">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        {{ form.username(class="form-control", placeholder="Enter your username") }}
+        {% if form.username.errors %}
+          <div class="alert alert-danger mt-2">
+            {% for error in form.username.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        {{ form.password(class="form-control", placeholder="Enter your password") }}
+        {% if form.password.errors %}
+          <div class="alert alert-danger mt-2">
+            {% for error in form.password.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <input type="submit" value="Log In" class="btn btn-primary btn-block">
+      </div>
+    </form>
+
+    <div class="form-footer">
+      <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a></p>
+    </div>
+  </div>
+
+</body>
+</html>
